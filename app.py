@@ -18,7 +18,8 @@ class GetToken:
 			r.lpush('mehrnews-users-tokens', userData['token'])
 			print 'User %s added to database.' % userData['token']
 	else:
-		r.lrem('mehrnews-users-tokens', 1, data.get('_push').get('android_tokens')[-1])
+		userData['token'] = data.get('_push').get('android_tokens')[-1]
+		r.lrem('mehrnews-users-tokens', 1, userData['token'])
 		print 'User %s removed from.' % userData['token']
 	resp.body=ujson.dumps(data)
 

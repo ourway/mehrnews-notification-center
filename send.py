@@ -5,6 +5,7 @@ import base64
 import ujson
 import redis
 import requests
+import time
 r=redis.StrictRedis()
 
 
@@ -26,7 +27,7 @@ newsList = news.get('newsList', [])
 # Define relevant info
 app_id = 'df617c83'
 private_key = 'c31f7ed4a2c581ef545b19f48b08741565674986a2a0d07f'
-device_tokens = ['APA91bEXl6WlY1DbCmu9W1IfijJYB-etc-6LZ-jnvlXmyZmjQ5RM8VqFBA2FAIUDdZnyA3FpXCFPsV1GSXJLYplpvQX4V6T9uRMUZKahk6thCVGqOuo3cxf_QiErfCwaF3Q3kmrDT5By']
+device_tokens = r.lrange('mehrnews-users-tokens', 0, -1)
 url = "https://push.ionic.io/api/v1/push"
 
 # Generate authentication
@@ -36,7 +37,7 @@ auth = "Basic %s" % b64
 # Build the JSON payload
 for i in newsList:
 	newsId = i.get('id')
-	if newsId in r.lrange('mehrnews-sent-news', 0, -1):
+	if str(newsId) in r.lrange('mehrnews-sent-news', 0, -1):
 		print 'news %s already sent to users' % newsId
 		continue
 	push_dict = {}
@@ -53,3 +54,4 @@ for i in newsList:
 	resp = urllib2.urlopen(req)
 	print 'news Item %s sent.' % newsId
 	r.lpush('mehrnews-sent-news', newsId)
+	time.sleep(10)
